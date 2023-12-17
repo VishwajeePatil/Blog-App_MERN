@@ -25,9 +25,16 @@ blogger.post("/create", async (req,res)=>{
         res.send("error While Creating Blog")
     }
 })
-blogger.put("/update/:id",(req,res)=>{
-    console.log(req.query)
-    res.send(`This Is Update Method For id ${req.params.id} `)
+blogger.put("/update/:id", async(req,res)=>{
+    const {id} = req.params;
+    const {title,description} = req.body;
+    try {
+        await BlogModel.findByIdAndUpdate({_id:id},{title,description})
+        res.send("Blog Updated SuccessFully")
+    } catch (error) {
+        res.send("Error While Updating Blog")
+        console.log(error)
+    }
 })
 blogger.delete("/delete/:id",(req,res)=>{
     console.log(req.query)
