@@ -2,10 +2,6 @@ const {UserModel} = require("../Models/userModel")
 const jwt = require("jsonwebtoken")
 const authentication = (req,res,next)=>{
     const token = req.headers.authorization?.split(" ")[1];
-    if(req.url=="/"){
-        next();
-    }
-    else{
         if(!token){
             res.status(404).send("Please Login First token not found");
         }
@@ -16,11 +12,11 @@ const authentication = (req,res,next)=>{
                 }
                 else{
                     const {id} = decoded;
-                    req.user_id=id;
+                    const user = await UserModel.findOne({_id:id})
+                    req.user=user;
                     next();
                 }
             })
         }
     }
-}
 module.exports={authentication}

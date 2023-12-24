@@ -8,14 +8,13 @@ blogger.get("/",async (req,res)=>{
 })
 blogger.post("/create", async (req,res)=>{
     const {title,description} = req.body;
-    const id = req.user_id
-    const user = await UserModel.findOne({_id:id})
-    const {name,email} = user;
+    const {_id,name,email} = req.user;
+    console.log(req.user)
     try {
         const new_blog = new BlogModel({
             title:title,
             description:description,
-            author_id:id,
+            author_id:_id,
             author_name:name,
             author_email:email
         })
@@ -23,17 +22,27 @@ blogger.post("/create", async (req,res)=>{
         res.send("Blog Created Successfully")
     } catch (error) {
         res.send("error While Creating Blog")
+        console.log(error)
     }
 })
 blogger.put("/update/:id", async(req,res)=>{
     const {id} = req.params;
     const {title,description} = req.body;
-    try {
-        await BlogModel.findByIdAndUpdate({_id:id},{title,description})
-        res.send("Blog Updated SuccessFully")
-    } catch (error) {
-        res.send("Error While Updating Blog")
-        console.log(error)
+    // const {_id,name,email} = req.user;
+    const {_id,name,email} = req.user;
+    console.log(req.user)
+    const blog = await BlogModel.findOne({id});
+    if(blog.author_id==_id){
+        try {
+            await BlogModel.findByIdAndUpdate({_id:id},{title,description})
+            res.send("Blog Updated SuccessFully")
+        } catch (error) {
+            res.send("Error While Updating Blog")
+            console.log(error)
+        }
+    }
+    else{
+        res.send("You Can't Edit Others Blog");
     }
 })
 blogger.delete("/delete/:id",(req,res)=>{
